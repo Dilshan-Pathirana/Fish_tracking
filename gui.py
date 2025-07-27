@@ -1,4 +1,5 @@
 import tkinter as tk
+import webbrowser
 from tkinter import filedialog, messagebox, scrolledtext
 import os
 import sys
@@ -47,6 +48,12 @@ class FishTrackerGUI:
 
         self.status_box = scrolledtext.ScrolledText(master, width=80, height=10)
         self.status_box.grid(row=6, column=0, columnspan=3, padx=10, pady=5)
+
+        link = tk.Label(master, text="Made by Dilshan – github.com/Dilshan-Pathirana", fg="blue", cursor="hand2", font=("Arial", 9, "italic"))
+        link.grid(row=7, column=0, columnspan=3, pady=(0, 10))
+        link.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/Dilshan-Pathirana"))
+
+
 
     def select_video_folder(self):
         folder = filedialog.askdirectory()
