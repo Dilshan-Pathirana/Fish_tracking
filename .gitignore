@@ -1,0 +1,5 @@
+/videos/
+# Ignore all video files
+
+/outputs/
+# Ignore all output files
