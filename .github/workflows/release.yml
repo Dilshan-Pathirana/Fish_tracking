@@ -1,35 +1,57 @@
-name: Build and Release FishTracker EXE
+name: Build and Release
 
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*'  # Example: v1.0.0
 
 permissions:
-  contents: write  # ✅ This line allows GitHub Actions to upload release assets
+  contents: write  # needed for GitHub release upload
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pyinstaller
 
       - name: Build EXE with PyInstaller
-        run: pyinstaller gui.py --noconfirm --onefile --name FishTracker
+        run: |
+          pyinstaller --onefile --noconsole gui.py
+        shell: cmd
 
-      - name: Upload release to GitHub
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FishTracker
+          path: dist/gui.exe  # Update this path to match your output
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FishTracker
+          path: .
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/FishTracker.exe
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: gui.exe  # or FishTracker.exe depending on output name
