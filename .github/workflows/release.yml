@@ -1,46 +1,35 @@
-name: Build and Release
+name: Build and Release FishTracker EXE
 
 on:
   push:
     tags:
-      - 'v*.*.*'  # Trigger on semantic version tags like v1.0.0, v2.3.4, etc.
+      - 'v*.*.*'
+
+permissions:
+  contents: write  # ✅ This line allows GitHub Actions to upload release assets
 
 jobs:
-  build-and-release:
+  build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller
+          pip install -r requirements.txt
 
-    - name: Build executable with PyInstaller
-      run: |
-        pyinstaller --onefile --windowed gui.py
+      - name: Build EXE with PyInstaller
+        run: pyinstaller gui.py --noconfirm --onefile --name FishTracker
 
-    - name: Create GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload EXE to release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref_name }}
-        name: FishTracker-${{ github.ref_name }}.exe
-        files: dist/gui.exe
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/FishTracker.exe
