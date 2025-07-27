@@ -1,12 +1,21 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 import os
-from multiprocessing import Pool
+import sys
+import concurrent.futures
 from datetime import datetime
 from tracker_wrapper import process_video
 from distance_calculator import calculate_summary  # We'll add this function next
 
 NUM_WORKERS = 10
+
+def get_resource_path(relative_path):
+    """Get absolute path to resource, works for PyInstaller and dev mode"""
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class FishTrackerGUI:
     def __init__(self, master):
@@ -74,13 +83,43 @@ class FishTrackerGUI:
         self.status_box.delete('1.0', tk.END)
         self.progress.set(0)
 
+        # Log total count and all names
+        self.log_message(f"🔍 Found {len(video_files)} videos:")
+        for v in video_files:
+            self.log_message(f"  • {os.path.basename(v)}")
+
+        batch_size = 10
+        total = len(video_files)
         log_filename = os.path.join(output_folder, f"batch_log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt")
+
         with open(log_filename, 'w', encoding="utf-8") as logfile:
-            for idx, video in enumerate(video_files, 1):
-                result = process_video(video, output_folder)
-                self.log_message(result)
-                logfile.write(result + "\n")
-                self.progress.set((idx / len(video_files)) * 100)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
+                for batch_start in range(0, total, batch_size):
+                    batch = video_files[batch_start:batch_start + batch_size]
+                    batch_names = [os.path.basename(v) for v in batch]
+
+                    self.log_message(f"\n▶️ Starting batch: {', '.join(batch_names)}")
+                    logfile.write(f"\n▶️ Starting batch: {', '.join(batch_names)}\n")
+
+                    futures = {executor.submit(process_video, video, output_folder): video for video in batch}
+
+                    for future in concurrent.futures.as_completed(futures):
+                        video = futures[future]
+                        video_name = os.path.basename(video)
+                        try:
+                            result = future.result()
+                            msg = f"✅ Completed {video_name}: {result}"
+                            self.log_message(msg)
+                            logfile.write(msg + "\n")
+                        except Exception as e:
+                            msg = f"❌ Error with {video_name}: {e}"
+                            self.log_message(msg)
+                            logfile.write(msg + "\n")
+
+                    self.log_message(f"✔️ Finished batch: {', '.join(batch_names)}")
+                    logfile.write(f"✔️ Finished batch: {', '.join(batch_names)}\n")
+
+                    self.progress.set(min(100, ((batch_start + len(batch)) / total) * 100))
 
         messagebox.showinfo("Done", f"Processed {len(video_files)} video(s).\nLog saved to:\n{log_filename}")
 
@@ -96,12 +135,18 @@ class FishTrackerGUI:
         else:
             messagebox.showerror("Error", "Could not calculate distance summary.")
 
-
 # Entry point
 if __name__ == "__main__":
     import multiprocessing
     multiprocessing.freeze_support()
 
-    root = tk.Tk()
-    app = FishTrackerGUI(root)
-    root.mainloop()
+    try:
+        root = tk.Tk()
+        app = FishTrackerGUI(root)
+        root.mainloop()
+    except Exception as e:
+        import traceback
+        with open("gui_crash_log.txt", "w") as f:
+            traceback.print_exc(file=f)
+        print("An error occurred. See gui_crash_log.txt for details.")
+        input("Press Enter to exit...")
