@@ -7,10 +7,15 @@ An AI-powered solution for aquaculture and scientific research, tracking fish mo
 ## 🚀 Features
 
 🎥 **Automated Tracking** — Computer vision with background subtraction, robust to occlusion and inactivity.
+
 ⚡ **Batch Processing** — Parallelized video analysis for large datasets using `concurrent.futures`.
+
 🖥️ **GUI Application** — Desktop interface for easy folder selection, progress tracking, and control.
+
 🔥 **Heatmap Generation** — Overlay fish trajectories on each video as visual heatmaps.
+
 📏 **Distance Analysis** — Compute real-world distance metrics from tracked centroids, export to CSV.
+
 ⚙️ **Configurable Workflow** — Flexible setup for video folders, output locations, and tank dimensions.
 
 ---
