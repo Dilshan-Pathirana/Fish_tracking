@@ -1,151 +1,90 @@
-# Fish Tracking System
+# 🐟 Fish Tracking System
 
-## Overview
-
-A robust, automated fish tracking solution for scientific research and aquaculture, featuring computer vision, batch processing, and a user-friendly GUI. Tracks fish movement, generates heatmaps, and computes real-world distance metrics from video data.
+An AI-powered solution for aquaculture and scientific research, tracking fish movements in real time from video data. Supports heatmap generation, distance analysis, and batch video processing with both GUI and CLI modes.
 
 ---
 
-## Table of Contents
+## 🚀 Features
 
-- Features
-- Project Structure
-- Installation
-- Usage
-  - GUI Mode
-  - Batch Mode
-  - Single Run Mode
-- Inputs & Outputs
-- Requirements
-- Contributing
-- License
-- Author
+🎥 **Automated Tracking** — Computer vision with background subtraction, robust to occlusion and inactivity.
+⚡ **Batch Processing** — Parallelized video analysis for large datasets using `concurrent.futures`.
+🖥️ **GUI Application** — Desktop interface for easy folder selection, progress tracking, and control.
+🔥 **Heatmap Generation** — Overlay fish trajectories on each video as visual heatmaps.
+📏 **Distance Analysis** — Compute real-world distance metrics from tracked centroids, export to CSV.
+⚙️ **Configurable Workflow** — Flexible setup for video folders, output locations, and tank dimensions.
 
 ---
 
-## Features
-- **Automated Fish Tracking:** Computer vision-based tracking with background subtraction, robust to occlusion and inactivity.
-- **Batch Processing:** Parallelized video analysis for large datasets using `concurrent.futures`.
-- **GUI Application:** Desktop interface for folder selection, progress tracking, and operation.
-- **Heatmap Generation:** Visual overlays of fish trajectories for each video.
-- **Distance Analysis:** Computes real-world movement from tracked centroids; outputs summary CSVs.
-- **Configurable Workflow:** Customizable video folders, output locations, and tank dimensions.
+## 🏗️ Tech Stack
+
+**Computer Vision & Backend**
+
+* Python (3.7+)
+* OpenCV — Video and tracking
+* NumPy — Data processing
+* Tkinter — GUI framework
+* concurrent.futures — Parallelized batch runs
+
+**Optional Packaging**
+
+* PyInstaller — Build standalone GUI executables
 
 ---
 
-## Project Structure
-| Path                   | Purpose                                              |
-|------------------------|------------------------------------------------------|
-| tracker.py     | Core object detection and tracking class             |
-| distance_calculator.py| Movement calculation and summary utilities           |
-| tracker_wrapper.py   | Unified video processing bridge for batch/GUI modes  |
-| gui.py / main.py   | GUI desktop application                              |
-| No_GUI.py            | CLI batch runner (multithreaded)                     |
-| single_run.py        | Interactive tracking/debug for single video          |
-| videos              | Raw input video files                                |
-| outputs             | Result files: CSV, heatmaps, logs                    |
-| requirements.txt     | Python library dependencies                          |
-| README.md            | Project documentation                                |
+## ⚙️ System Architecture
 
----
+📂 **Project Structure (Planned)**
 
-## Installation
-
-### 1. Clone the Repository
-```sh
-git clone https://github.com/Dilshan-Pathirana/fish-tracking.git
-cd fish-tracking
 ```
-
-### 2. Set Up Python Environment
-- **Python 3.7+ required**
-```sh
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```sh
-pip install -r requirements.txt
+fish-tracking-system/
+│
+├── tracker.py             # Core object detection + tracking
+├── distance_calculator.py # Movement calculations + CSV summary
+├── tracker_wrapper.py     # Unified bridge for batch/GUI modes
+├── gui.py / main.py       # GUI desktop app
+├── No_GUI.py              # CLI batch runner (multithreaded)
+├── single_run.py          # Interactive tracking/debug for single video
+├── videos/                # Raw input video files
+├── outputs/               # Results: CSV, heatmaps, logs
+├── requirements.txt       # Dependencies
+└── README.md              # Documentation
 ```
 
 ---
 
-## Usage
+## 🎯 Use Case Scenario
 
-### GUI Mode
-Start the graphical application:
-```sh
-python gui.py
-# or
-python main.py
-```
-- Select the video folder and output folder.
-- Press **Start Tracking** to begin.
-- Use **Calculate Distance Summary** for summary metrics.
+🔬 **Aquaculture & Research Example:**
 
-### Batch Mode
-Run batch processing (no GUI):
-```sh
-python No_GUI.py [video_directory] [output_directory]
-```
-- Requires at least two arguments, or set paths inside the script.
-
-### Single Run Mode
-Track a single video interactively:
-```sh
-python single_run.py
-```
-- Follow the ROI selection prompt for the fish tank region.
+* Track fish activity across multiple tanks.
+* Generate heatmaps of fish trajectories for behavioral analysis.
+* Log real-world distances traveled for growth and stress studies.
+* Export structured CSVs for scientific publications.
 
 ---
 
-## Inputs & Outputs
-| Type           | Details                                                        |
-|----------------|----------------------------------------------------------------|
-| Input Videos   | Supported formats: `.mp4`, `.avi`, `.mov` (place in videos) |
-| CSV Output     | Centroid tracking data per video (data): Time, X, Y |
-| Heatmap Images | Overlay images of fish paths (heatmaps): PNG format |
-| Summary CSV    | Distance traveled summary for all processed videos (distance_summary.csv) |
-| Logs           | Batch logs (timestamped) per run (`outputs/batch_log_*.txt`)   |
+## 🚦 Roadmap
+
+* ✅ Build tracking pipeline with background subtraction
+* ✅ Add GUI support with Tkinter
+* ✅ Implement batch + single video modes
+* ✅ Enable heatmap and CSV export
+* ⏳ Package GUI with PyInstaller
+* ⏳ Add advanced analytics dashboards
 
 ---
 
-## Requirements
-- **Python:** 3.7+
-- **Libraries:**
-  - `opencv-python>=4.7.0`
-  - `numpy>=1.21.0`
-  - `tkinter` (standard, no installation needed)
-  - `concurrent.futures` (bundled from Python 3.2+)
-  - `pyinstaller` (optional, for packaging GUI as executable)
+## 🤝 Contributing
 
-> **Note:** If packaging with PyInstaller, ensure plugin inclusion for Tkinter.
+* Follow **PEP-8** style guidelines.
+* Document scientific code (see *Ten Simple Rules for Documenting Scientific Software*).
+* Open issues for bugs/features.
+* Pull requests welcome with code reviews.
 
 ---
 
-## Contributing
-- Follow [PEP-8](https://peps.python.org/pep-0008/) style guide.
-- Write clear comments for scientific code ([Ten Simple Rules for Documenting Scientific Software](https://doi.org/10.1371/journal.pcbi.1006561)).
-- Submit issues and feature requests via [GitHub Issues](https://github.com/Dilshan-Pathirana/fish-tracking/issues).
-- For significant changes, open pull requests with code reviews.
+## 👤 Author
 
----
-
-## Author
-Made by [Dilshan Pathirana](https://github.com/Dilshan-Pathirana)
-
----
-
-## Additional Notes
-- `Tkinter` is built-in with standard Python distributions (no pip needed).
-- If GUI packaging is desired, add `pyinstaller` as an optional dependency.
-- To regenerate requirements.txt from imports, use:
-  ```sh
-  pipreqs .
-  ```
+Made by **Dilshan Pathirana**
 
 ---
