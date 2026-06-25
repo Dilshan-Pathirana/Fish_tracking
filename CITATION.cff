@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+type: software
+title: "FishTracker: a lightweight, open-source tool for video tracking and space-use quantification of single aquatic animals in laboratory assays"
+message: "If you use this software, please cite it using these metadata."
+authors:
+  - family-names: "Pathirana"
+    given-names: "Dilshan"
+    orcid: "0000-0000-0000-0000"  # TODO: Replace with actual ORCID from https://orcid.org/
+    affiliation: "Department of Zoology, University of Peradeniya"
+date-released: "2025-01-15"
+version: "1.0.0"
+doi: "10.21105/joss.00000"  # TODO: Update with actual JOSS DOI after publication
+repository-code: "https://github.com/Dilshan-Pathirana/Fish_tracking"
+repository: "https://github.com/Dilshan-Pathirana/Fish_tracking"
+url: "https://github.com/Dilshan-Pathirana/Fish_tracking"
+keywords:
+  - "animal tracking"
+  - "computer vision"
+  - "behavioral ecology"
+  - "video analysis"
+  - "aquatic animals"
+  - "laboratory research"
+  - "background subtraction"
+  - "centroid detection"
+license: MIT
+references:
+  - type: journal-article
+    title: "FishTracker: a lightweight, open-source tool for video tracking and space-use quantification of single aquatic animals in laboratory assays"
+    authors:
+      - family-names: "Pathirana"
+        given-names: "Dilshan"
+    journal: "Journal of Open Source Software"
+    volume: "10"
+    issue: "XX"
+    pages: "XXXX"
+    year: "2025"
+    doi: "10.21105/joss.00000"  # TODO: Update with actual JOSS DOI

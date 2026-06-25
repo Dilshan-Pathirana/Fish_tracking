@@ -1,26 +1,59 @@
+"""Interactive single-video debugging module with ROI selection.
+
+Provides SimpleFishTracker for real-time tracking validation on new footage,
+combining dark-object detection with motion detection for robust tracking
+in challenging lighting conditions.
+"""
+
 import cv2
 import time
 import numpy as np
+from typing import Optional, List, Tuple
+
 
 class SimpleFishTracker:
-    def __init__(self, video_path):
-        self.video_path = video_path
-        self.cap = cv2.VideoCapture(video_path)
+    """Interactive fish tracker with ROI selection and real-time visualization.
 
-        self.last_bbox = None
-        self.no_movement_frames = 0
-        self.max_no_movement_frames = 90
-        self.trail = []
-        self.prev_gray = None
-        self.roi = None  # (x, y, w, h)
+    Combines threshold-based dark object detection with motion detection
+    to robustly track stationary and moving animals. Allows user-defined
+    ROI selection before processing and real-time visualization with
+    pause/resume capability.
+    """
 
-    def select_roi(self):
+    def __init__(self, video_path: str) -> None:
+        """Initialize the simple tracker.
+
+        Args:
+            video_path: Path to the input video file.
+
+        Raises:
+            IOError: If video file cannot be opened.
+        """
+        self.video_path: str = video_path
+        self.cap: cv2.VideoCapture = cv2.VideoCapture(video_path)
+
+        self.last_bbox: Optional[Tuple[int, int, int, int]] = None
+        self.no_movement_frames: int = 0
+        self.max_no_movement_frames: int = 90
+        self.trail: List[Tuple[int, int]] = []
+        self.prev_gray: Optional[np.ndarray] = None
+        self.roi: Optional[Tuple[int, int, int, int]] = None
+
+    def select_roi(self) -> None:
+        """Interactively select region of interest (ROI) from first frame.
+
+        Displays first frame and allows user to select a rectangular ROI
+        using mouse. Resets video to frame 0 after selection.
+
+        Raises:
+            RuntimeError: If first frame cannot be read.
+            ValueError: If user closes ROI selector without selecting a region.
+        """
         print("🖱️ Select the ROI (fish tank area), then press ENTER or SPACE.")
         ret, frame = self.cap.read()
         if not ret:
             raise RuntimeError("Couldn't read frame to select ROI.")
 
-        # Resize window for selection
         frame_resized = frame.copy()
         cv2.namedWindow("Select ROI", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Select ROI", 1024, 768)
@@ -32,26 +65,38 @@ class SimpleFishTracker:
             raise ValueError("No ROI selected!")
 
         print(f"✅ ROI selected: {self.roi}")
-        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Reset to first frame after ROI selection
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-    def process_frame(self, frame):
+    def process_frame(self, frame: np.ndarray) -> np.ndarray:
+        """Process a single frame to detect and track the animal within ROI.
+
+        Uses combined dark-object and motion detection within the selected ROI.
+        Falls back to dark-object-only detection if motion detection fails.
+        Maintains a visual trail of detected positions.
+
+        Args:
+            frame: Input video frame (BGR format).
+
+        Returns:
+            Annotated frame with ROI, bounding box, and trail visualization.
+        """
+        if self.roi is None:
+            raise RuntimeError("ROI not selected. Call select_roi() first.")
+
         x, y, w, h = self.roi
         roi_frame = frame[y:y+h, x:x+w]
         gray = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2GRAY)
 
-        # Detect dark objects
         _, dark_mask = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
 
         if self.prev_gray is None:
             self.prev_gray = gray.copy()
-            return frame  # Skip first frame
+            return frame
 
-        # Detect motion
         blurred = cv2.GaussianBlur(gray, (3, 3), 0)
         frame_diff = cv2.absdiff(blurred, self.prev_gray)
         _, motion_mask = cv2.threshold(frame_diff, 1, 255, cv2.THRESH_BINARY)
 
-        # Combine masks
         combined_mask = cv2.bitwise_and(dark_mask, motion_mask)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         combined_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_OPEN, kernel)
@@ -67,7 +112,6 @@ class SimpleFishTracker:
             rx, ry, rw, rh = cv2.boundingRect(cnt)
             cx, cy = rx + rw // 2, ry + rh // 2
 
-            # Convert ROI coordinates back to full-frame
             abs_cx, abs_cy = cx + x, cy + y
             abs_box = (rx + x, ry + y, rw, rh)
             cv2.rectangle(frame, (abs_box[0], abs_box[1]),
@@ -77,7 +121,6 @@ class SimpleFishTracker:
             detected = True
             break
 
-        # Fallback: track still fish (dark object only)
         if not detected:
             _, dark_mask_full = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
             fallback_contours, _ = cv2.findContours(dark_mask_full, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -88,7 +131,6 @@ class SimpleFishTracker:
                 x_dark, y_dark, w_dark, h_dark = cv2.boundingRect(cnt)
                 cx, cy = x_dark + w_dark // 2, y_dark + h_dark // 2
 
-                # Convert to full-frame coordinates
                 abs_x, abs_y = x_dark + x, y_dark + y
                 cv2.rectangle(frame, (abs_x, abs_y), (abs_x + w_dark, abs_y + h_dark), (0, 255, 255), 2)
 
@@ -96,7 +138,6 @@ class SimpleFishTracker:
                 detected = True
                 break
 
-        # Draw trail
         if cx != -1 and cy != -1:
             self.trail.append((cx + x, cy + y))
             if len(self.trail) > 50:
@@ -105,15 +146,20 @@ class SimpleFishTracker:
         for point in self.trail:
             cv2.circle(frame, point, 2, (0, 255, 255), -1)
 
-        # Draw the selected ROI on top
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-        # Update previous
         self.prev_gray = gray.copy()
 
         return frame
 
-    def run(self):
+    def run(self) -> None:
+        """Process and display video with real-time tracking.
+
+        Displays annotated video frames with tracking visualization.
+        Controls:
+            - q: Quit
+            - p: Pause/resume playback
+        """
         self.select_roi()
 
         window_name = "Simple Fish Tracker (ROI)"
@@ -128,7 +174,6 @@ class SimpleFishTracker:
 
             processed = self.process_frame(frame)
 
-            # Show FPS
             fps = 1 / (time.time() - start_time + 1e-5)
             cv2.putText(processed, f"FPS: {fps:.2f}", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
@@ -148,7 +193,27 @@ class SimpleFishTracker:
         self.cap.release()
         cv2.destroyAllWindows()
 
+def main() -> None:
+    """Entry point for the interactive single-video debug mode.
+
+    Allows user to select a video file and track with ROI selection.
+    """
+    import sys
+
+    if len(sys.argv) >= 2:
+        video_path = sys.argv[1]
+    else:
+        print("Usage: fish-tracker-debug <video_file>")
+        print("\nExample: fish-tracker-debug ./videos/sample.mp4")
+        sys.exit(1)
+
+    try:
+        tracker = SimpleFishTracker(video_path)
+        tracker.run()
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    video_path = "videos/20.mp4"  # 🔁 Replace with your video file
-    tracker = SimpleFishTracker(video_path)
-    tracker.run()
+    main()
