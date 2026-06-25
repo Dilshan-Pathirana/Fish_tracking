@@ -12,7 +12,7 @@ authors:
     orcid: "0009-0008-2039-8884"
     affiliation: 1
 affiliations:
-  - name: "Department of Zoology, University of Peradeniya, Sri Lanka"  # TODO: Update with your institution
+  - name: "Department of Zoology, University of Peradeniya, Sri Lanka"
     index: 1
 date: "25 June 2026"
 bibliography: paper.bib
@@ -52,6 +52,10 @@ FishTracker deliberately trades multi-animal and pose capability for simplicity,
 ## Validation
 
 FishTracker's centroid-tracking and distance outputs underpin the movement (track length) and space-use (risky-zone time) variables in a companion behavioural study of amphibian larvae personality [@rajapaksha2025], in which it was used to batch-process several hundred open-field, novel-object, and mirror-test recordings across two species.
+
+## AI usage disclosure
+
+Generative AI tools (Claude, Anthropic) were used during development to assist with: code refactoring and docstring generation, scaffolding of the unit test suite, drafting sections of this paper, and reviewing documentation. All AI-assisted outputs were reviewed, edited, and validated by the author. All core design decisions — the background-subtraction pipeline, interpolation strategy, GUI architecture, and choice of output formats — were made by the human author.
 
 ## Acknowledgements
 
