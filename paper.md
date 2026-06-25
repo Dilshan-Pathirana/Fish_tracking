@@ -9,12 +9,12 @@ tags:
   - aquaculture
 authors:
   - name: Dilshan Pathirana
-    orcid: "0000-0000-0000-0000"  # TODO: Replace with your ORCID from https://orcid.org/
+    orcid: "0009-0008-2039-8884"
     affiliation: 1
 affiliations:
   - name: "Department of Zoology, University of Peradeniya, Sri Lanka"  # TODO: Update with your institution
     index: 1
-date: "15 January 2025"  # TODO: Update with submission date
+date: "25 June 2026"
 bibliography: paper.bib
 ---
 
@@ -51,7 +51,7 @@ FishTracker deliberately trades multi-animal and pose capability for simplicity,
 
 ## Validation
 
-FishTracker's centroid-tracking and distance outputs underpin the movement (track length) and space-use (risky-zone time) variables in a companion behavioural study of amphibian larvae personality [@rajapaksha2025], in which it was used to batch-process several hundred open-field, novel-object, and mirror-test recordings across two species. A focused accuracy/throughput validation against manually digitized trajectories on a video subset is reported separately [@pathirana2026methods].
+FishTracker's centroid-tracking and distance outputs underpin the movement (track length) and space-use (risky-zone time) variables in a companion behavioural study of amphibian larvae personality [@rajapaksha2025], in which it was used to batch-process several hundred open-field, novel-object, and mirror-test recordings across two species.
 
 ## Acknowledgements
 

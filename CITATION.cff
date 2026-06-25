@@ -5,7 +5,7 @@ message: "If you use this software, please cite it using these metadata."
 authors:
   - family-names: "Pathirana"
     given-names: "Dilshan"
-    orcid: "0000-0000-0000-0000"  # TODO: Replace with actual ORCID from https://orcid.org/
+    orcid: "https://orcid.org/0009-0008-2039-8884"
     affiliation: "Department of Zoology, University of Peradeniya"
 date-released: "2025-01-15"
 version: "1.0.0"
