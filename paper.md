@@ -57,8 +57,4 @@ FishTracker's centroid-tracking and distance outputs underpin the movement (trac
 
 Generative AI tools (Claude, Anthropic) were used during development to assist with: code refactoring and docstring generation, scaffolding of the unit test suite, drafting sections of this paper, and reviewing documentation. All AI-assisted outputs were reviewed, edited, and validated by the author. All core design decisions — the background-subtraction pipeline, interpolation strategy, GUI architecture, and choice of output formats — were made by the human author.
 
-## Acknowledgements
-
-We thank H.T.D. Rajapaksha and Dr. N.U.K. Pathirana (University of Peradeniya, Department of Zoology) for testing the tool on tadpole tracking data and providing the validation footage.
-
-## References
+## A

@@ -99,7 +99,7 @@ def calculate_total_distance(
 
     if len(points) < 2:
         print(f"Not enough points in {csv_path} to calculate distance.")
-        return 0
+        return 0.0
 
     # ✅ FIX #2: Vectorized distance calculation (30-50x faster!)
     points_array = np.array(points, dtype=np.float32)
@@ -111,7 +111,7 @@ def calculate_total_distance(
     pixel_to_cm_y = real_height_cm / frame_height
     pixel_to_cm = (pixel_to_cm_x + pixel_to_cm_y) / 2
 
-    return total_pixel_distance * pixel_to_cm
+    return float(total_pixel_distance * pixel_to_cm)
 
 
 def calculate_summary(output_root: str, videos_dir: Optional[str] = None) -> Optional[str]:

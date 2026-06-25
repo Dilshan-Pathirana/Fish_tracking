@@ -37,6 +37,8 @@ class FishTracker:
         self.video_path: str = video_path
         self.output_dir: str = output_dir
         self.cap: cv2.VideoCapture = cv2.VideoCapture(video_path)
+        if not self.cap.isOpened():
+            raise IOError(f"Cannot open video file: {video_path}")
         # ✅ FIX #9: Reduce MOG2 history for faster processing (3-5% faster!)
         # Smaller history (100 frames = ~3 sec at 30fps) is sufficient for most tracking scenarios
         self.fgbg: cv2.BackgroundSubtractorMOG2 = cv2.createBackgroundSubtractorMOG2(
@@ -51,6 +53,7 @@ class FishTracker:
         self.positions: List[Tuple[int, int]] = []
         self.valid_frame_shape: Optional[Tuple[int, int, int]] = None  # ✅ FIX #8: Store shape, not frame
         self.last_frame_for_heatmap: Optional[np.ndarray] = None  # Keep last frame only for heatmap overlay
+        self.valid_frame: Optional[np.ndarray] = None  # Last successfully read frame (alias for heatmap frame)
         self.start_time: int = self.current_time_ms()
 
         self.show_window: bool = show_window
@@ -162,6 +165,7 @@ class FishTracker:
             self.valid_frame_shape = frame.shape
             # Keep last frame for heatmap overlay (only 1 frame in memory)
             self.last_frame_for_heatmap = frame.copy()
+            self.valid_frame = self.last_frame_for_heatmap
             # ✅ FIX #4: Pass frame number for efficient timestamp handling
             self.process_frame_with_frame_number(frame, frame_number)
 
@@ -297,5 +301,5 @@ class FishTracker:
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-        # ✅ FIX #8: Release frame to free memory after heatmap is saved
+        # Release frame to free memory after heatmap is saved
         self.last_frame_for_heatmap = None
