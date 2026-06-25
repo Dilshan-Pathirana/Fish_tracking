@@ -1,0 +1,4 @@
+[console_scripts]
+fish-tracker-batch = No_GUI:main
+fish-tracker-debug = single_run:main
+fish-tracker-gui = main:main

@@ -3,3 +3,4 @@
 
 /outputs/
 # Ignore all output files
+/.venv-1
