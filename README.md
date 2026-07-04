@@ -1,4 +1,4 @@
-<img width="1241" height="1268" alt="WhatsApp Image 2026-06-03 at 14 31 09" src="https://github.com/user-attachments/assets/c5793f67-1c4a-4b54-bc03-8b04939e0810" />
+<img width="1376" height="768" alt="Picsart_26-07-04_13-14-29-916" src="https://github.com/user-attachments/assets/d8e98ba4-6b55-40f2-9a20-e8362c9f8762" />
 # FishTracker
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
