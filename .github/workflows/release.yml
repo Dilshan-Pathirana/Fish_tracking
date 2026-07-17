@@ -29,14 +29,14 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --noconsole gui.py
+          pyinstaller --onefile --noconsole --name FishTracker main.py
         shell: cmd
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: FishTracker
-          path: dist/gui.exe  # Update this path to match your output
+          path: dist/FishTracker.exe
 
   release:
     needs: build
@@ -54,4 +54,4 @@ jobs:
         with:
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-          files: gui.exe  # or FishTracker.exe depending on output name
+          files: FishTracker.exe

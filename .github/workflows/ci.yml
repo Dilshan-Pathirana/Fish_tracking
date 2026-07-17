@@ -43,10 +43,10 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed gui.py
+          pyinstaller --onefile --windowed --name FishTracker main.py
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: FishTracker-exe
-          path: dist/gui.exe
+          path: dist/FishTracker.exe

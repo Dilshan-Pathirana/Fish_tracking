@@ -4,3 +4,12 @@
 /outputs/
 # Ignore all output files
 /.venv-1
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# Test/coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/

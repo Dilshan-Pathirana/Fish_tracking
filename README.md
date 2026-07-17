@@ -52,7 +52,14 @@ sudo apt-get install python3-tk
 python main.py
 ```
 
-Select an input video folder and an output folder, click **Start Tracking**, then **Calculate Distance Summary**.
+A modern, non-blocking desktop UI with light/dark themes:
+
+1. **Select folders** — browse to your video folder and an output folder.
+2. **Calibrate arena** — enter the real-world width/height (cm) of the tank visible in frame (defaults to 28 × 14 cm).
+3. Click **Start Tracking** — videos process in parallel in the background while the UI stays responsive; a live progress bar, per-video ETA, and color-coded activity log show status. Use **Cancel** to stop a running batch.
+4. The distance summary is calculated automatically once tracking finishes (or run it manually any time with **Calculate Distance Summary**).
+
+Your folder selections, calibration values, and theme choice are remembered between sessions.
 
 ### Batch / CLI mode
 
@@ -86,7 +93,7 @@ For each input video `<name>.mp4`:
 
 ## Calibrating to your own arena
 
-Distance conversion assumes a known real-world arena size (default: 28 × 14 cm, the tank dimensions used in our validation case study — see `paper.md`). To use a different tank, pass `real_width_cm` / `real_height_cm` to `calculate_total_distance()` / `calculate_summary()` in `distance_calculator.py`, or edit the defaults directly.
+Distance conversion assumes a known real-world arena size (default: 28 × 14 cm, the tank dimensions used in our validation case study — see `paper.md`). In the GUI, set **Width (cm)** / **Height (cm)** in the calibration section before starting a run. In CLI/batch mode, pass `real_width_cm` / `real_height_cm` to `calculate_total_distance()` / `calculate_summary()` in `distance_calculator.py`, or edit the defaults directly.
 
 ---
 
@@ -117,7 +124,7 @@ Fish_tracking/
 ├── utils/tracker.py        # Core detection + tracking + heatmap/CSV export
 ├── distance_calculator.py  # Pixel→cm conversion + summary CSV
 ├── tracker_wrapper.py      # Bridge between batch/GUI modes and the tracker
-├── main.py / gui.py        # Tkinter GUI application
+├── main.py                  # Tkinter/ttk GUI application
 ├── No_GUI.py                # CLI batch runner (multithreaded)
 ├── single_run.py            # Interactive ROI-based debug mode
 ├── requirements.txt

@@ -8,6 +8,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Redesigned GUI (`main.py`) built on `tkinter.ttk` with a custom light/dark theme,
+  card-based layout, and header
+- Arena calibration (width/height cm) exposed directly in the GUI, wired through to
+  `distance_calculator.calculate_summary`
+- Live per-video progress bar with completed count and estimated time remaining
+- Cancel button to stop an in-progress batch run
+- Color-coded activity log (success/error/warning/info)
+- Persisted user settings (last-used folders, calibration values, theme) saved to
+  `~/.fishtracker_settings.json`
+- Input validation in the GUI (missing/invalid folders, identical video/output folder,
+  non-numeric or non-positive calibration values) with actionable error messages
+
+### Fixed
+- Tracking batches no longer freeze the GUI window: the batch loop now runs on a
+  background thread instead of blocking the Tkinter main loop while awaiting futures
+- `FishTracker.save_results()` queried `frame_width`/`frame_height` from the video
+  capture *after* it had already been released, always writing `0` into
+  `<name>_metadata.json`; this silently produced incorrect (or, after the summary
+  lookup was fixed to prefer metadata, division-by-zero) distance calculations.
+  Video properties are now captured once while the capture is open, in `__init__`
+  - **Impact**: any previously generated `*_metadata.json` file has `frame_width: 0,
+    frame_height: 0` and should be deleted so it gets regenerated on the next tracking
+    run (`calculate_summary` falls back to reopening the video when metadata is
+    missing/invalid)
+- `distance_calculator.calculate_summary` only ever looked for `<name>.mp4` next to
+  the output folder's data directory; it now also matches `.avi`/`.mov` (matching the
+  extensions accepted everywhere else) and no longer requires the video file to exist
+  when a valid metadata JSON is already available
+- `calculate_summary` did not forward `real_width_cm`/`real_height_cm` to
+  `calculate_total_distance`, so custom calibration silently had no effect when called
+  through the summary entry point
+
+### Removed
+- `gui.py` / `gui.spec` — a stale, unfixed duplicate of `main.py` (outdated worker
+  count, no docstrings/type hints); `pyproject.toml`'s `fish-tracker-gui` entry point
+  already pointed at `main:main`, so `gui.py` was dead weight. CI and release
+  workflows now build `main.py` instead.
 - Comprehensive docstrings (PEP 257) for all modules and functions
 - Type hints for all function signatures
 - Unit test suite with ≥70% code coverage

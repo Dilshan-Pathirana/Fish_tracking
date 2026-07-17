@@ -5,13 +5,6 @@ handling path resolution for both PyInstaller bundled executables and
 development environments.
 """
 
-"""Wrapper module for video processing with resource path resolution.
-
-Provides a bridge between batch/GUI modes and the FishTracker core module,
-handling path resolution for both PyInstaller bundled executables and
-development environments.
-"""
-
 import os
 import sys
 from utils.tracker import FishTracker

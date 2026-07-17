@@ -114,7 +114,12 @@ def calculate_total_distance(
     return float(total_pixel_distance * pixel_to_cm)
 
 
-def calculate_summary(output_root: str, videos_dir: Optional[str] = None) -> Optional[str]:
+def calculate_summary(
+    output_root: str,
+    videos_dir: Optional[str] = None,
+    real_width_cm: float = 28,
+    real_height_cm: float = 14,
+) -> Optional[str]:
     """
     Calculate distance summaries for all CSVs in output_root/data
     and save a summary CSV in output_root.
@@ -122,6 +127,8 @@ def calculate_summary(output_root: str, videos_dir: Optional[str] = None) -> Opt
     Args:
         output_root: Folder where `data` folder with CSVs is located and summary CSV will be saved.
         videos_dir: Optional folder where original videos are stored. Defaults to sibling "videos" folder.
+        real_width_cm: Real-world width of the tank/arena in cm, used for pixel→cm calibration.
+        real_height_cm: Real-world height of the tank/arena in cm, used for pixel→cm calibration.
 
     Returns:
         Path to summary CSV or None on failure.
@@ -132,26 +139,42 @@ def calculate_summary(output_root: str, videos_dir: Optional[str] = None) -> Opt
 
     summary_csv = os.path.join(output_root, 'distance_summary.csv')
 
-    if not os.path.exists(data_dir) or not os.path.exists(videos_dir):
+    if not os.path.exists(data_dir):
         print("❌ Required directories not found.")
         return None
 
-    csv_files = [f for f in os.listdir(data_dir) if f.lower().endswith('.csv')]
+    csv_files = [
+        f for f in os.listdir(data_dir)
+        if f.lower().endswith('.csv') and not f.lower().endswith('_metadata.csv')
+    ]
     if not csv_files:
         print("❌ No CSV files found in data directory.")
         return None
 
+    video_extensions = (".mp4", ".avi", ".mov")
+
     results = []
     for csv_file in csv_files:
         name = os.path.splitext(csv_file)[0]
-        video_path = os.path.join(videos_dir, name + ".mp4")
         csv_path = os.path.join(data_dir, csv_file)
+        metadata_path = os.path.join(data_dir, f"{name}_metadata.json")
 
-        if not os.path.exists(video_path):
-            print(f"⚠️ Missing video for: {csv_file}")
+        video_path = next(
+            (os.path.join(videos_dir, name + ext) for ext in video_extensions
+             if os.path.exists(os.path.join(videos_dir, name + ext))),
+            None,
+        )
+
+        if video_path is None and not os.path.exists(metadata_path):
+            print(f"⚠️ Missing video and metadata for: {csv_file}")
             continue
 
-        distance = calculate_total_distance(csv_path, video_path)
+        distance = calculate_total_distance(
+            csv_path,
+            video_path or "",
+            real_width_cm=real_width_cm,
+            real_height_cm=real_height_cm,
+        )
         if distance is not None:
             results.append([name, f"{distance:.2f}"])
         else:

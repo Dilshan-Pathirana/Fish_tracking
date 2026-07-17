@@ -39,6 +39,15 @@ class FishTracker:
         self.cap: cv2.VideoCapture = cv2.VideoCapture(video_path)
         if not self.cap.isOpened():
             raise IOError(f"Cannot open video file: {video_path}")
+
+        # Captured immediately while the capture is open: these properties
+        # read as 0 once self.cap.release() has been called, so save_results()
+        # must not rely on querying self.cap after run() finishes.
+        self.frame_width: int = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.frame_height: int = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.fps: float = float(self.cap.get(cv2.CAP_PROP_FPS)) or 30.0
+        self.total_frames: int = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
         # ✅ FIX #9: Reduce MOG2 history for faster processing (3-5% faster!)
         # Smaller history (100 frames = ~3 sec at 30fps) is sufficient for most tracking scenarios
         self.fgbg: cv2.BackgroundSubtractorMOG2 = cv2.createBackgroundSubtractorMOG2(
@@ -233,7 +242,7 @@ class FishTracker:
         csv_path = os.path.join(self.output_dir, 'data', f"{video_name}.csv")
 
         # ✅ FIX #4: Format timestamps in batch (faster than per-frame!)
-        fps = self.cap.get(cv2.CAP_PROP_FPS) or 30.0
+        fps = self.fps
         csv_data = []
         for row in self.centroid_data:
             frame_num_or_timestamp = row[0]
@@ -254,10 +263,10 @@ class FishTracker:
 
         # ✅ FIX #6: Save metadata to avoid reopening video (10-20% faster on distance calc!)
         metadata = {
-            'frame_width': int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-            'frame_height': int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-            'fps': float(self.cap.get(cv2.CAP_PROP_FPS)) or 30.0,
-            'total_frames': int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT)),
+            'frame_width': self.frame_width,
+            'frame_height': self.frame_height,
+            'fps': self.fps,
+            'total_frames': self.total_frames,
         }
         metadata_path = os.path.join(self.output_dir, 'data', f"{video_name}_metadata.json")
         with open(metadata_path, 'w') as f:
